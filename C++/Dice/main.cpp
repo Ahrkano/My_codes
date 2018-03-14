@@ -66,7 +66,7 @@ int main()
 			cria_dado(colecao,qtd_dados);
 			lanca_dado(&colecao[j]);
 			std::cout<<"  dado "<<j+1<<": "<<colecao[j].get_lado()<<""<<std::endl;
-			sum += sum + colecao[j].get_lado();
+			sum += colecao[j].get_lado();
 		}
 		
 	}
