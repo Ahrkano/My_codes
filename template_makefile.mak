@@ -8,7 +8,7 @@ OPCOES_COMP=-c -Wall -std=C99 -lm
 OPCOES_LINK= 
 
 # arquivos-fonte (modifique/acrescente)
-FONTES=main.c arq1.c arq2.compilacao
+FONTES=main.c arq1.c arq2.c
 
 # a macro a seguir informa que os arquivos-objeto sao
 # obtidos a partir dos arquivos-fonte, substituindo
