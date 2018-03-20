@@ -8,8 +8,6 @@
 #include "Sapo.h"
 
 #include <iostream>
-#include <algorithm>
-#include <vector>
 #include <stdlib.h>
 
 
