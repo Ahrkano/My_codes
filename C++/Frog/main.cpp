@@ -17,13 +17,14 @@ int main()
 {
 	srand (time(NULL));
 
+
 	Sapo kako = Sapo(1,0,0);
 	Sapo keko = Sapo(2,0,0);
 	Sapo kiko = Sapo(3,0,0);
 
 	apresentacao();
 
-	while(!chegada(kako, percurso) && !chegada(keko, percurso) && !chegada(kiko, percurso))
+	while(Sapo::distancia_total < percurso)
 	{
 		kako.pular();
 		if(chegada(kako, percurso))

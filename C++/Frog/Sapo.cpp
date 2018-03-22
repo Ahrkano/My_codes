@@ -18,6 +18,9 @@ void Sapo::pular()
 	set_pulos(get_pulos()+1);
 	set_distancia(get_distancia()+pulo);
 
+	if(distancia_total < get_distancia())
+		distancia_total = get_distancia();
+
 }
 
 Sapo::Sapo()
