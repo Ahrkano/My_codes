@@ -66,13 +66,6 @@ public:
      */
 	void showParticipantes();
 
-    /** @brief .
-     *  @return sem retorno.
-     */
-	void ver_estatisticas();
-
-
-
 };
 
 #endif /* SRC_CORRIDA_H_ */

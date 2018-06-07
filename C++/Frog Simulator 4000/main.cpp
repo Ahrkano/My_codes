@@ -70,7 +70,7 @@ int main()
 					break;
 			case 3	:estatistica(Competidores);
 					break;
-			case 4://estatistica das corridas
+			case 4:mostrar_stats();
 					break;
 			case 5:	Atual = escolher_pista(Pistas_disponiveis);
 					if(Atual == NULL)
@@ -105,6 +105,7 @@ int main()
 					}
 
 					estatistica(&Ranking);
+					salvar_arquivo_stats(&Ranking, Silvestre);
 					Ranking.clear();
 
 					Atual = NULL;

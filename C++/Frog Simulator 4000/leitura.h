@@ -54,6 +54,17 @@ bool ler_arquivo_trajetos(std::vector<Pista*>* conjunto);
  */
 bool salvar_arquivo_corrida(Corrida* corr);
 
+/** @brief escreve num arquivo as estatisicas da corrida.
+ *  @param corr ponteiro para Corrida.
+ *  @param conjunto ponteiro para vetor de Sapo.
+ *  @return booleano.
+ */
+bool salvar_arquivo_stats(std::vector<Sapo*>* conjunto, Corrida* corr);
 
+/** @brief le um arquivo exibe os dados na tela.
+ *  @param sem parametro.
+ *  @return sem retorno.
+ */
+void mostrar_stats();
 
 #endif /* SRC_LEITURA_H_ */

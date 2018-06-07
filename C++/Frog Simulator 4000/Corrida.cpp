@@ -74,14 +74,6 @@ void Corrida::showParticipantes()
 	std::cout << '\n';
 }
 
-/** @details .
- *  @return sem retorno.
- */
-void Corrida::ver_estatisticas()
-{
-
-}
-
 /** @details limpa o vetor de sapos.
  */
 Corrida::~Corrida()

@@ -229,3 +229,53 @@ bool salvar_arquivo_corrida(Corrida* corr)
 		 std::cerr<<"Arquivo nao foi aberto"<<std::endl;
 	 return false;
 }
+
+/** @details escreve num arquivo as estatisicas da corrida
+ *  @param corr ponteiro para Corrida.
+ *  @param conjunto ponteiro para vetor de Sapo.
+ *  @return booleano.
+ */
+bool salvar_arquivo_stats(std::vector<Sapo*>* conjunto, Corrida* corr)
+{
+	std::ofstream file;
+	file.open("stats.txt", std::ios::out | std::ios::app);
+
+	if(file.is_open())
+	{
+		file<<corr->getTrack()->getNome()<<std::endl;
+		file<<corr->getTrack()->getTamanho()<<std::endl;
+
+		for (unsigned i = 0; i < conjunto->size(); i++)
+		{
+			file<<conjunto->at(i)->getNome()<<std::endl;
+			file<<conjunto->at(i)->getIdentificador()<<std::endl;
+		}
+
+		file.close();
+		return true;
+	}
+	else
+		 std::cerr<<"Arquivo nao foi aberto"<<std::endl;
+		 return false;
+}
+
+/** @details exibe as estatisticas das corridas na tela.
+ *  @param sem parametro.
+ *  @return sem retorno.
+ */
+void mostrar_stats()
+{
+	std::ifstream file("stats.txt", std::ios_base::in);
+	std::string line;
+	if(file.is_open())
+	{
+		while (file >> line)
+		{
+			std::cout<<line<<std::endl;
+		}
+		file.close();
+	}
+	else
+		 std::cerr<<"Arquivo nao foi aberto"<<std::endl;
+
+}
