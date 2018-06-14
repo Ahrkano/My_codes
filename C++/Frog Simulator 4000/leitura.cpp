@@ -5,58 +5,8 @@
  * @since 04/06/2018
  * @date 06/06/2018
  */
-
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <string>
 #include "leitura.h"
-#include "Sapo.h"
-#include "Pista.h"
-#include "Corrida.h"
 
-/** @details percorre o vetor de Sapo checando se existe um sapo no vetor
- *  com o id igual ao inteiro que foi passado.
- *  @param num possivel id de Sapo.
- *  @param conjunto ponteiro para vetor de Sapo.
- *  @return booleano.
- */
-bool ja_existe(int num, std::vector<Sapo*>* conjunto)
-{
-	for (unsigned i = 0; i < conjunto->size(); i++)
-	{
-		if(conjunto->at(i)->getIdentificador() == num)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-/** @details percorre o vetor de Pista checando se existe uma pista no vetor
- *  com o id igual ao inteiro que foi passado.
- *  @param num possivel id de Pista.
- *  @param conjunto ponteiro para vetor de Pista.
- *  @return booleano.
- */
-bool ja_existe(int num, std::vector<Pista*>* conjunto)
-{
-	for (unsigned i = 0; i < conjunto->size(); i++)
-	{
-		if(conjunto->at(i)->getId() == num)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-/** @details le o arquivo "sapos.txt" e armazena as informacoes de cada sapo no vetor.
- *  Se nao for possivel abrir o arquivo uma mensagemde erro sera exibida na tela.
- *  @param conjunto ponteiro para vetor de Sapo.
- *  @return booleano.
- */
 bool ler_arquivo_competidores(std::vector<Sapo*>* conjunto )
 {
 	std::string nome;
@@ -66,8 +16,8 @@ bool ler_arquivo_competidores(std::vector<Sapo*>* conjunto )
 	int _emp;
 	int _qtd_pulos_total;
 
-	std::ifstream file("sapos.txt", std::ios_base::in);
 	std::string line;
+	std::ifstream file ("sapos.txt");
 	int controle;
 
 	if(file.is_open())
@@ -99,8 +49,7 @@ bool ler_arquivo_competidores(std::vector<Sapo*>* conjunto )
 						break;
 				case 5: ss.imbue(std::locale::classic());
 						ss >> _qtd_pulos_total;
-
-						if(!ja_existe(_id, conjunto))
+						if(!procurar_id(conjunto, _id))
 						{
 							Sapo* novo = new Sapo(_id, _qtd_provas, _vit, _emp, _qtd_pulos_total, nome);
 							conjunto->push_back(novo);
@@ -111,6 +60,7 @@ bool ler_arquivo_competidores(std::vector<Sapo*>* conjunto )
 			controle++;
 		}
 		file.close();
+		return true;
 	}
 	else
 	{
@@ -132,6 +82,7 @@ bool salvar_arquivo_competidores(Sapo* novo)
 
 	 if(file.is_open())
 	 {
+		 file<<std::endl;
 		 file<<novo->getNome()<<std::endl;
 		 file<<novo->getIdentificador()<<std::endl;
 		 file<<novo->getQuantidade_de_provas_disputadas()<<std::endl;
@@ -146,20 +97,14 @@ bool salvar_arquivo_competidores(Sapo* novo)
 	 return false;
 }
 
-/** @details le o arquivo "pistas.txt" e armazena as informacoes de cada pista no vetor.
- *  Se nao for possivel abrir o arquivo uma mensagemde erro sera exibida na tela.
- *  @param conjunto ponteiro para vetor de Pista.
- *  @return booleano.
- */
-bool ler_arquivo_trajetos(std::vector<Pista*>* conjunto)
+bool ler_arquivo_pistas(std::vector<Pista*>* conjunto)
 {
-	std::ifstream file("pistas.txt", std::ios_base::in);
 	std::string line;
+	std::ifstream file ("pistas.txt");
 	std::string nome;
 	int tam;
 	int id;
 	int controle;
-	int aux;
 
 	if(file.is_open())
 	{
@@ -168,11 +113,9 @@ bool ler_arquivo_trajetos(std::vector<Pista*>* conjunto)
 		while (std::getline(file, line))
 		{
 
-			aux = controle%3;
-
 			std::istringstream ss(line);
 
-			switch(aux)
+			switch(controle%3)
 			{
 				case 0: nome = line;
 						break;
@@ -181,7 +124,7 @@ bool ler_arquivo_trajetos(std::vector<Pista*>* conjunto)
 			    		break;
 				case 2:	ss.imbue(std::locale::classic());
 			    		ss >> id;
-			    		if(!ja_existe(id, conjunto))
+			    		if(!procurar_id(conjunto, id))
 			    		{
 			    		   	Pista* novo = new Pista(nome, tam, id);
 			    		   	conjunto->push_back(novo);
@@ -200,82 +143,105 @@ bool ler_arquivo_trajetos(std::vector<Pista*>* conjunto)
 	return false;
 }
 
-/** @details escreve num arquivo os dados da corrida, sendo eles:
- * 	o nome da pista e seu id, bem com o nome de cada sapo e seu
- * 	respecrivo id.
- *  @param corr ponteiro para Corrida.
- *  @return booleano.
- */
-bool salvar_arquivo_corrida(Corrida* corr)
-{
-	 std::ofstream file;
-	 file.open("corridas.txt", std::ios::out | std::ios::app);
-
-	 if(file.is_open())
-	 {
-		 file<<corr->getTrack()->getNome()<<std::endl;
-		 file<<corr->getTrack()->getTamanho()<<std::endl;
-
-		 for (unsigned i = 0; i < corr->getParticipantes().size(); i++)
-		 {
-		 		file<<corr->getParticipantes().at(i)->getNome()<<std::endl;
-		 		file<<corr->getParticipantes().at(i)->getIdentificador()<<std::endl;
-		 }
-
-		 file.close();
-		 return true;
-	 }
-	 else
-		 std::cerr<<"Arquivo nao foi aberto"<<std::endl;
-	 return false;
-}
-
-/** @details escreve num arquivo as estatisicas da corrida
- *  @param corr ponteiro para Corrida.
- *  @param conjunto ponteiro para vetor de Sapo.
- *  @return booleano.
- */
-bool salvar_arquivo_stats(std::vector<Sapo*>* conjunto, Corrida* corr)
+bool salvar_corrida(Corrida* evento, Sapo* vencedor)
 {
 	std::ofstream file;
-	file.open("stats.txt", std::ios::out | std::ios::app);
+	file.open("corridas.txt", std::ios::out | std::ios::app);
 
 	if(file.is_open())
 	{
-		file<<corr->getTrack()->getNome()<<std::endl;
-		file<<corr->getTrack()->getTamanho()<<std::endl;
-
-		for (unsigned i = 0; i < conjunto->size(); i++)
-		{
-			file<<conjunto->at(i)->getNome()<<std::endl;
-			file<<conjunto->at(i)->getIdentificador()<<std::endl;
-		}
-
+		file<<evento->getTrack()->getNome()<<std::endl;
+		file<<evento->getParticipantes().size()<<" participantes"<<std::endl;
+		file<<vencedor->getNome()<<" foi o vencedor"<<std::endl;
+		file<<std::endl;
 		file.close();
 		return true;
 	}
 	else
 		 std::cerr<<"Arquivo nao foi aberto"<<std::endl;
-		 return false;
+	 return false;
 }
 
-/** @details exibe as estatisticas das corridas na tela.
- *  @param sem parametro.
- *  @return sem retorno.
- */
-void mostrar_stats()
+bool ler_estatisticas_corridas()
 {
-	std::ifstream file("stats.txt", std::ios_base::in);
+	  std::string line;
+	  std::ifstream file ("corridas.txt");
+
+	  if (file.is_open())
+	  {
+
+	    while(std::getline(file, line))
+	    {
+	    	std::cout << line <<std::endl;
+	    }
+	    file.close();
+	    return true;
+	  }
+
+	  else
+		  std::cerr<<"Arquivo nao foi aberto"<<std::endl;
+
+	  return false;
+}
+
+bool ler_estatisticas_sapos()
+{
+
 	std::string line;
+	std::ifstream file ("sapos.txt");
+	int controle = 0;
+
 	if(file.is_open())
 	{
-		while (file >> line)
+		while (std::getline(file, line))
 		{
-			std::cout<<line<<std::endl;
+			std::cout<<std::endl;
+
+			if(controle%6 == 0)
+				std::cout<<"Nome: "<<line<<std::endl;
+			if(controle%6 == 1)
+				std::cout<<"Id: "<<line<<std::endl;
+			if(controle%6 == 2)
+				std::cout<<"Provas disputadas : "<<line<<std::endl;
+			if(controle%6 == 3)
+				std::cout<<"Vitorias : "<<line<<std::endl;
+			if(controle%6 == 4)
+				std::cout<<"Empates : "<<line<<std::endl;
+			if(controle%6 == 5)
+				std::cout<<"Pulos totais : "<<line<<std::endl;
+
+			controle++;
 		}
 		file.close();
 	}
 	else
-		 std::cerr<<"Arquivo nao foi aberto"<<std::endl;
+	{
+		std::cerr<<"Arquivo nao foi aberto"<<std::endl;
+	}
 
+	return false;
+}
+
+bool atualizar_sapos(std::vector<Sapo*>* conjunto)
+{
+	std::ofstream file;
+	file.open("sapos.txt");
+
+	if(file.is_open())
+	{
+		for(unsigned int i = 0; i < conjunto->size(); i++)
+		{
+			file<<conjunto->at(i)->getNome()<<std::endl;
+			file<<conjunto->at(i)->getIdentificador()<<std::endl;
+			file<<conjunto->at(i)->getQuantidade_de_provas_disputadas()<<std::endl;
+			file<<conjunto->at(i)->getVitorias()<<std::endl;
+			file<<conjunto->at(i)->getEmpates()<<std::endl;
+			file<<conjunto->at(i)->getQuantidade_de_pulos_total()<<std::endl;
+		}
+	 	 file.close();
+	 	 return true;
+	}
+	else
+		std::cerr<<"Arquivo nao foi aberto"<<std::endl;
+	return false;
 }

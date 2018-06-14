@@ -48,6 +48,7 @@ Sapo::Sapo()
 	this->empates = 0;
 	this->quantidade_de_pulos_total = 0;
 	this->nome = "vazio";
+	this->chegou = false;
 }
 
 /** @details cria um Sapo com os atributos especificados pelos parametros abaixo.
@@ -68,6 +69,7 @@ Sapo::Sapo(int id, int provas, int vit, int emp, int pulos, const std::string& N
 	this->empates = emp;
 	this->quantidade_de_pulos_total = pulos;
 	this->nome = Nome;
+	this->chegou = false;
 }
 
 /** @details identificador recebe o valor id.
@@ -197,6 +199,16 @@ void Sapo::setNome(const std::string& palavra)
 const std::string& Sapo::getNome()
 {
 	return nome;
+}
+
+void Sapo::setChegou(bool valor)
+{
+	this->chegou = valor;
+}
+
+bool Sapo::getChegou()
+{
+	return chegou;
 }
 
 /** @details destrutor da classe Sapo.

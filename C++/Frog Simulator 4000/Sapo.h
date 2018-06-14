@@ -24,6 +24,7 @@ private:
 	int empates;							///< A Quantidade de empates.
 	int quantidade_de_pulos_total;			///< A quantidade de pulos dada em todas as corridas.
 	std::string nome;						///< Nome do Sapo.
+	bool chegou;
 
 public:
 	static int distancia_total;				///< Indica a distancia percorrida pelo primeiro sapo durante a corrida.
@@ -139,6 +140,10 @@ public:
      *  @return string.
      */
 	const std::string& getNome();
+
+	void setChegou(bool valor);
+
+	bool getChegou();
 
 };
 

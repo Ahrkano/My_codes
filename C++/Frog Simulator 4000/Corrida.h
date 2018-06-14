@@ -54,7 +54,7 @@ public:
      *  @param participante ponteiro para Sapo.
      *  @return sem retorno.
      */
-	void setParticipantes(Sapo* participante);
+	void setParticipantes(std::vector<Sapo*>* participante);
 
     /** @brief acessa e retorna o vetor de sapos.
      *  @return vetor de ponteiro para Sapo.

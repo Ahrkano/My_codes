@@ -5,72 +5,136 @@
  * @since 15/05/2018
  * @date 06/06/2018
  */
-
-#include "funcoes.h"
-#include "Sapo.h"
-
-#include <iostream>
 #include <stdlib.h>
+#include "funcoes.h"
 
-/** @details calcula o tamanho do pulo que o sapo pode dar usando valores aleatorios de um conjunto limitado de inteiros.
- *  @param min limite inferior do pulo.
- *  @param max limite superior do pulo.
- *  @return inteiro.
- */
 int variacao(int min, int max)
 {
 	return rand() % max + min;
 }
 
-/** @details checa se um sapo atingiu o final da pista.
- *  @param participante sapo a ser analisado.
- *  @param meta tamnaho da pista.
- *  @return booleano.
- */
-bool chegada(Sapo participante, int meta)
+
+bool procurar_id(std::vector<Sapo*>* lista, int _id)
 {
-	if(participante.getDistancia_percorrida() >= meta)
-		return true;
+	for(unsigned int i = 0; i < lista->size(); i++)
+		if(lista->at(i)->getIdentificador() == _id)
+			return true;
 	return false;
 }
 
-/** @details imprime as informacoes acerca de todos os sapos presentes no conjunto.
- *  @param Participantes vetor de sapos.
- *  @return sem retorno.
- */
-void estatistica(std::vector<Sapo*>* Participantes)
+bool procurar_id(std::vector<Pista*>* lista, int _id)
 {
-	system("@cls||clear");
+	for(unsigned int i = 0; i < lista->size(); i++)
+		if(lista->at(i)->getId() == _id)
+			return true;
+	return false;
+}
 
-	for (unsigned i = 0; i < Participantes->size(); i++)
+Sapo* criar_sapo(std::vector<Sapo*>* lista)
+{
+	int id;
+	int provas;
+	int vit;
+	int emp;
+	int pulos;
+	std::string Nome;
+
+	Sapo* novo = NULL;
+
+	std::cout<<"Nome: ";
+	std::cin.ignore();
+	std::getline(std::cin, Nome);
+	std::cout<<std::endl;
+	std::cout<<"Id: ";
+	std::cin>>id;
+	std::cout<<std::endl;
+	std::cout<<"Provas disputadas: ";
+	std::cin>>provas;
+	std::cout<<std::endl;
+	std::cout<<"Vitorias: ";
+	std::cin>>vit;
+	std::cout<<std::endl;
+	std::cout<<"Empates: ";
+	std::cin>>emp;
+	std::cout<<std::endl;
+	std::cout<<"Historico de pulos: ";
+	std::cin>>pulos;
+	std::cout<<std::endl;
+
+	if(!procurar_id(lista, id))
 	{
-		std::cout<<"Nome: "<<Participantes->at(i)->getNome()<<std::endl;
-		std::cout<<"ID: "<<Participantes->at(i)->getIdentificador()<<std::endl;
-		std::cout<<"Distancia percorrida: "<<Participantes->at(i)->getDistancia_percorrida()<<" unidades"<<std::endl;
-		std::cout<<"Contagem de pulos: "<<Participantes->at(i)->getQuantidade_de_pulos_total()<<std::endl;
-		std::cout<<"Vitorias: "<<Participantes->at(i)->getVitorias()<<std::endl;
-		std::cout<<"Empates: "<<Participantes->at(i)->getEmpates()<<std::endl;
-		std::cout<<std::endl;
+		novo = new Sapo(id, provas, vit, emp, pulos, Nome);
 	}
+	else
+	{
+		std::cerr<<"ID fornecido ja existe. Competidor nao cadastrado."<<std::endl;
+	}
+	return novo;
 }
 
-/** @details imprime mensagem de boas-vindas no comeco do programa.
- *  @return sem retorno.
- */
-void apresentacao()
+Corrida* preparar_corrida(Corrida* evento, std::vector<Pista*>* tracks, std::vector<Sapo*>* part)
 {
-	std::cout<<"\nBEM VINDO AO FROGRACE JUMP SIMULATOR 4000!";
+	int id_pista;
+	std::cout<<std::endl;
+	std::cout<<"Digite o id da Pista: ";
+	std::cin>>id_pista;
+	evento->setTrack(tracks->at(id_pista));
+	evento->setParticipantes(part);
+	return evento;
 }
 
-/** @details imprime o menu do programa com todas as opcoes disponiveis,
- *  em seguida eh feito o tratamento da opcao escolhida para que nao seja possivel
- *  entrar com uma opcao inexistente no menu.
- *  @param op ponteiro para inteiro que guarda a opcao do menu.
- *  @return sem retorno.
- */
-void menu(int *op)
+bool chegada(std::vector<Sapo*>* lista, int meta,std::vector<Sapo*>* ranking)
 {
-	int opcao = -1;
+	std::vector<Sapo*> finalistas;
+	std::vector<Sapo*> empatados;
+	Sapo* maximo;
+
+	for(unsigned int i = 0; i < lista->size(); i++)
+	{
+		if(lista->at(i)->getDistancia_percorrida() >= meta)
+			finalistas.push_back(lista->at(i));
+	}
+
+	maximo = finalistas.at(0);
+
+	for(unsigned int i = 0; i < finalistas.size(); i++)
+	{
+		if(finalistas.at(i)->getDistancia_percorrida() > maximo->getDistancia_percorrida())
+		{
+			maximo = finalistas.at(i);
+		}
+	}
+
+	for(unsigned int i = 0; i < finalistas.size(); i++)
+	{
+		if(maximo->getDistancia_percorrida() == finalistas.at(i)->getDistancia_percorrida())
+		{
+				empatados.push_back(finalistas.at(i));
+		}
+	}
+
+	if(empatados.size() > 1)
+	{
+		for(unsigned int i = 0; i < empatados.size(); i++)
+		{
+			empatados.at(i)->setEmpates(empatados.at(i)->getEmpates()+1);
+			ranking->push_back(empatados.at(i));
+		}
+		return true;
+	}
+	else
+	{
+		maximo->setVitorias(maximo->getVitorias()+1);
+		ranking->push_back(maximo);
+		return true;
+	}
+
+	return false;
+}
+
+void controle_de_menu(int* opcao)
+{
+	int op = -1;
 
 	std::cout<<"==================================="<<std::endl;
 	std::cout<<"FROG SIMULATOR 4000"<<std::endl;
@@ -82,65 +146,18 @@ void menu(int *op)
 	std::cout<<"5 - Start"<<std::endl;
 	std::cout<<"===================================="<<std::endl;
 
-	while(opcao < 0 || opcao > 5)
+	while(op < 0 || op > 5)
 	{
 		std::cout<<"Escolha a opcao desejada:"<<std::endl;
-		std::cin>>opcao;
+		std::cin>>op;
 	}
 
 	 system("@cls||clear");
 
-	 *op = opcao;
+	 *opcao = op;
 }
 
-/** @details imprime mensagem de jogar novamente, em seguida eh feito
- *  o tratamento da opcao escolhida para que nao seja possivel
- *  entrar com uma opcao inexistente.
- *  @param op ponteiro para caractere que guarda a opcao do menu.
- *  @param si ponteiro para booleano que guarda o valor verdade da resposta.
- *  @return sem retorno.
- */
-void menu(char *op, bool *si)
-{
-	while(*op != 'y' || *op != 'n')
-	{
-		std::cout<<"Deseja jogar novamete (y/n) ?"<<std::endl;
-		std::cin>>*op;
-	}
-
-	if(*op == 'n')
-		*si = false;
-
-	system("@cls||clear");
-}
-
-/** @details cria um novo objeto sapo.
- *  @param add ponteiro para Sapo destinado a guardar o objeto.
- *  @return sem retorno.
- */
-void criar_sapo(Sapo* add)
-{
-	add = new Sapo();
-	std::string nome;
-	int num;
-
-	std::cout<<"Nome: ";
-	std::getline(std::cin, nome);
-	std::cout<<std::endl;
-	std::cout<<"Identificacao: ";
-	std::cin>>num;
-	std::cout<<std::endl;
-
-	add->setNome(nome);
-	add->setIdentificador(num);
-}
-
-/** @details funcao que escolhe uma pista do conjunto de pistas baseado no id da mesma.
- *  Se o id informado nao estiver no vetor um ponteiro nulo eh retornado.
- *  @param pis ponteiro para um vetor de ponteiros para Pista.
- *  @return Pista.
- */
-Pista* escolher_pista(std::vector<Pista*>* pis)
+bool escolher_pista(Pista* pistao, std::vector<Pista*>* pis)
 {
 	int num = -1;
 	std::cout<<"Entre com o numero da pista"<<std::endl;
@@ -149,19 +166,118 @@ Pista* escolher_pista(std::vector<Pista*>* pis)
 	for (unsigned i = 0; i < pis->size(); i++)
 	{
 		if (num == pis->at(i)->getId())
-			return pis->at(i);
+		{
+			*pistao = *pis->at(i);
+			return true;
+		}
 	}
-	return NULL;
+
+	std::cout<<"Pista nao encontrada"<<std::endl;
+
+	return false;
 }
 
-/** @details limpa o vetor de sapo usado a corrida.
- *  @param corr ponteiro para corrida.
- *  @return sem retorno.
- */
-void encerrar_corrida(Corrida* corr)
+void ver_participantes(std::vector<Sapo*>* lista)
 {
-	for (unsigned i = 0; i < corr->getParticipantes().size(); i++)
+	std::cout<<"Participantes: "<<std::endl;
+
+	for(unsigned int i = 0; i < lista->size(); i++)
 	{
-		corr->getParticipantes().pop_back();
+		std::cout<<"Nome: "<<lista->at(i)->getNome()<<std::endl;
+		std::cout<<"Id: "<<lista->at(i)->getIdentificador()<<std::endl;
 	}
+}
+
+void pei()
+{
+	std::cout<<"Aperte Enter para comecar a corrida!"<<std::endl;
+	std::cin.get();
+	system("@cls||clear");
+}
+
+void corre_negada(std::vector<Sapo*>* lista, int meta, std::vector<Sapo*>* ranking)
+{
+	bool meta_alcancada = false;
+
+	while(!meta_alcancada)
+	{
+		for (unsigned i = 0; i < lista->size(); i++)
+		{
+			if(lista->at(i)->getDistancia_percorrida() < meta )
+				lista->at(i)->pular();
+		}
+
+		if(lista->at(0)->distancia_total >= meta)
+		{
+			meta_alcancada = true;
+			chegada(lista, meta, ranking);
+		}
+	}
+
+	for (unsigned i = 0; i < lista->size(); i++)
+	{
+		if(lista->at(i)->getDistancia_percorrida() < meta && lista->at(i)->getChegou() == false)
+		{
+			lista->at(i)->pular();
+			if(lista->at(i)->getDistancia_percorrida() >= meta )
+			{
+				lista->at(i)->setChegou(true);
+				ranking->push_back(lista->at(i));
+			}
+		}
+	}
+
+}
+
+void resetar_sapos(std::vector<Sapo*>* lista)
+{
+	for (unsigned i = 0; i < lista->size(); i++)
+	{
+		lista->at(i)->setDistancia_percorrida(0);
+		lista->at(i)->setQuantidade_de_pulos(0);
+		lista->at(i)->setQuantidade_de_provas_disputadas(lista->at(i)->getQuantidade_de_provas_disputadas()+1);
+		lista->at(i)->setChegou(false);
+	}
+}
+
+void mostrar_ranking(std::vector<Sapo*>* ranking)
+{
+	std::cout<<"Resultado da corrida: "<<std::endl;
+	ver_participantes(ranking);
+}
+
+void jogar_novamente(bool* jogar)
+{
+	char j = 'x';
+
+	while(j != 78 || j!= 89 || j != 110 || j != 121)
+	{
+		std::cout<<"Jogar novamente (y/n) ?";
+		std::cin>>j;
+	}
+	if(j == 121 || j == 89)
+		*jogar = true;
+	else
+		*jogar = false;
+}
+
+
+void liberar_espaco(std::vector<Sapo*>* lista)
+{
+	for (unsigned i = lista->size(); i > 0 ; i--)
+	{
+			delete lista->at(i);
+			lista->pop_back();
+	}
+	lista->clear();
+}
+
+void liberar_espaco(std::vector<Pista*>* lista)
+{
+	for (unsigned i = lista->size(); i > 0 ; i--)
+	{
+			delete lista->at(i);
+			lista->pop_back();
+	}
+	lista->clear();
 }

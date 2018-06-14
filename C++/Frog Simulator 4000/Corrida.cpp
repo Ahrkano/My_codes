@@ -50,9 +50,12 @@ Pista* Corrida::getTrack()
  *  @param participante ponteiro para Sapo.
  *  @return sem retorno.
  */
-void Corrida::setParticipantes(Sapo* participante)
+void Corrida::setParticipantes(std::vector<Sapo*>* participantes)
 {
-	Participantes.push_back(participante);
+	for (unsigned i = 0; i < participantes->size(); i++)
+		{
+			Participantes.push_back(participantes->at(i));
+		}
 }
 
 /** @details acessa e retorna o vetor de sapos.
@@ -78,6 +81,11 @@ void Corrida::showParticipantes()
  */
 Corrida::~Corrida()
 {
-	Participantes.clear();
+	delete Track;
+	for (unsigned i = Participantes.size(); i > 0 ; i--)
+	{
+		delete Participantes.at(i);
+		Participantes.pop_back();
+	}
 }
 

@@ -9,64 +9,43 @@
 #ifndef SRC_FUNCOES_H_
 #define SRC_FUNCOES_H_
 
+#include <iostream>
+#include <string>
 #include <vector>
 #include "Sapo.h"
+#include "Pista.h"
 #include "Corrida.h"
 
-/** @brief calcula o tamanho do pulo que o sapo pode dar.
- *  @param min limite inferior do pulo.
- *  @param max limite superior do pulo.
- *  @return inteiro.
- */
 int variacao(int min, int max);
 
-/** @brief checa se um sapo atingiu o final da pista.
- *  @param participante sapo a ser analisado.
- *  @param meta tamnaho da pista.
- *  @return booleano.
- */
-bool chegada(Sapo participante, int meta);
+bool procurar_id(std::vector<Sapo*>* lista, int _id);
 
-/** @brief imprime as informacoes acerca de todos os sapos de um conjunto.
- *  @param Participantes vetor de sapos.
- *  @return sem retorno.
- */
-void estatistica(std::vector<Sapo*>* Participantes);
+bool procurar_id(std::vector<Pista*>* lista, int _id);
 
-/** @brief imprime mensagem de boas-vindas.
- *  @return sem retorno.
- */
-void apresentacao();
+Sapo* criar_sapo(std::vector<Sapo*>* lista);
 
-/** @brief imprime o menu do programa.
- *  @param op ponteiro para inteiro que guarda a opcao do menu.
- *  @return sem retorno.
- */
-void menu(int *op);
+Corrida* preparar_corrida(Corrida* evento, std::vector<Pista*>* tracks, std::vector<Sapo*>* part);
 
-/** @brief imprime mensagem de jogar novamente.
- *  @param op ponteiro para caractere que guarda a opcao do menu.
- *  @param si ponteiro para booleano que guarda o valor verdade da resposta.
- *  @return sem retorno.
- */
-void menu(char *op, bool *si);
+bool chegada(std::vector<Sapo*>* lista, int meta,std::vector<Sapo*>* ranking);
 
-/** @brief cria um novo sapo.
- *  @param add ponteiro para Sapo destinado a guardar o objeto.
- *  @return sem retorno.
- */
-void criar_sapo(Sapo* add);
+void controle_de_menu(int* opcao);
 
-/** @brief funcao que escolhe uma pista do conjunto de pistas baseado no id da mesma.
- *  @param pis ponteiro para um vetor de ponteiros para Pista.
- *  @return Pista.
- */
-Pista* escolher_pista(std::vector<Pista*>* pis);
+bool escolher_pista(Pista* pistao, std::vector<Pista*>* pis);
 
-/** @brief limpa um vetor de sapo.
- *  @param corr ponteiro para corrida.
- *  @return sem retorno.
- */
-void encerrar_corrida(Corrida* corr);
+void ver_participantes(std::vector<Sapo*>* lista);
+
+void pei();
+
+void corre_negada(std::vector<Sapo*>* lista, int meta, std::vector<Sapo*>* ranking);
+
+void resetar_sapos(std::vector<Sapo*>* lista);
+
+void mostrar_ranking(std::vector<Sapo*>* ranking);
+
+void jogar_novamente(bool* jogar);
+
+void liberar_espaco(std::vector<Sapo*>* lista);
+
+void liberar_espaco(std::vector<Pista*>* lista);
 
 #endif /* SRC_FUNCOES_H_ */

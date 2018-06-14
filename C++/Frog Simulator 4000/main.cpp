@@ -1,132 +1,88 @@
-/**
-*@file main.cpp
-*@brief programa principal
-*@author Alexandre
-*@since 30/05/2018
-*@date 06/06/2018
-*/
-
-#include <iostream>
-#include <vector>
-#include <time.h>
-#include <stdlib.h>
-#include "Sapo.h"
-#include "funcoes.h"
-#include "Pista.h"
-#include "leitura.h"
-
-/** @details funcao principal do programa que simula uma corrida de sapos.
- *  As informacoes acerca dos sapos sao obtidas a partir do arquivo "sapos.txt"
- *  e armazenadas no vetor de sapos 'Competidores'.
- *  As informacoes acerca das pistas sao obtidas a partir do arquivo "pistas.txt"
- *  e armazenadas no vetor de pistas 'Pistas_disponiveis'.
- *  Dentro de um laco principal ocorre o gerenciamento da corrida, onde o usuario
- *  pode criar novos sapos, criar corridas, ver as estatisticas dos sapos, ver as
- *  estatisticas das corridas e iniciar a corrida.
- *  Antes de terminar o processo de execucao da corida, eh gerado e exibido um
- *  ranking da corrida com todos os sapos em suas respectivas posicoes de chegada.
- *  Quando o processo de execucao da corrida acaba o usuario eh questionado se deseja jogar novamente.
+/*
+ * main.cpp
+ *
+ *  Created on: 13 de jun de 2018
+ *      Author: Alexandre
  */
-int main()
+#include <iostream>
+#include <fstream>
+#include <string>
+
+#include "Sapo.h"
+#include "Pista.h"
+#include "Corrida.h"
+#include "leitura.h"
+#include "funcoes.h"
+
+using namespace std;
+
+int main ()
 {
-	srand (time(NULL));
-	//guardar estatisticas
-	std::vector<Sapo*> Ranking;
-	//lista de pistas
-	std::vector<Pista*>* Pistas_disponiveis = new std::vector<Pista*>();
-	//lista de sapos
-	std::vector<Sapo*>* Competidores = new std::vector<Sapo*>();
-	//pista escolhida
-	Pista* Atual = new Pista();
-	//corrida
-	Corrida* Silvestre = NULL;
+	vector<Sapo*> conjunto;
+	vector<Pista*> tracks;
+	Corrida* Silvestre;
 
-	Sapo* sapo_aux;
+	Pista* Atual = NULL;
+	Sapo* novo_sapo = NULL;
+	vector<Sapo*> ranking;
 
-	int opcao = 0;
+	if(!ler_arquivo_competidores(&conjunto))
+		cerr<<"Falha ao importar competidores"<<endl;
+
+	if(!ler_arquivo_pistas(&tracks))
+		cerr<<"Falha ao importar pistas"<<endl;
+
+	int opcao;
 	bool simulacao = true;
-	char simu = 'x';
-
-	if(!ler_arquivo_competidores(Competidores) || !ler_arquivo_trajetos(Pistas_disponiveis))
-	{
-		std::cerr<<"Falha na leitura dos arquivos"<<std::endl;
-		return -1;
-	}
-
-	apresentacao();
 
 	while(simulacao)
 	{
-
-		menu(&opcao);
+		controle_de_menu(&opcao);
 
 		switch(opcao)
 		{
-			case 1:	criar_sapo(sapo_aux);
-					Competidores->push_back(sapo_aux);
-					salvar_arquivo_competidores(sapo_aux);
+			case 1:	novo_sapo = criar_sapo(&conjunto);
+					conjunto.push_back(novo_sapo);
+					salvar_arquivo_competidores(novo_sapo);
 					break;
-			case 2: Silvestre = new Corrida(Atual, Competidores);
+			case 2:	Silvestre->getParticipantes().clear();
+					Silvestre->setTrack(NULL);
+					liberar_espaco(&ranking);
+					Silvestre = new Corrida(Atual, &conjunto);
 					break;
-			case 3	:estatistica(Competidores);
+			case 3:	ler_estatisticas_sapos();
 					break;
-			case 4:mostrar_stats();
+			case 4: ler_estatisticas_corridas();
 					break;
-			case 5:	Atual = escolher_pista(Pistas_disponiveis);
-					if(Atual == NULL)
-						break;
-					salvar_arquivo_corrida(Silvestre);
-					Silvestre->showParticipantes();
-
-					Silvestre->setTrack(Atual);
-					int chegada = Atual->getTamanho();
-					int ordem = 0;
-
-					std::cout<<"Aperte Enter para comecar a corrida"<<std::endl;
-					std::cin.get();
-
-					for (unsigned i = 0; i < Silvestre->getParticipantes().size(); i++)
+			case 5: if(!escolher_pista(Atual, &tracks))
 					{
-						if(Silvestre->getParticipantes().at(i)->getDistancia_percorrida() < chegada )
-							Silvestre->getParticipantes().at(i)->pular();
-
-						if(Silvestre->getParticipantes().at(i)->getDistancia_percorrida() >=
-								Silvestre->getParticipantes().at(i)->distancia_total)
-						{
-							for (unsigned j = 0; j < Competidores->size(); j++)
-								if(Silvestre->getParticipantes().at(i)->getIdentificador() == Competidores->at(j)->getIdentificador())
-									ordem++;
-
-							if(ordem == 0)
-								Competidores->push_back(Silvestre->getParticipantes().at(i));
-
-							ordem = 0;
-						}
+						std::cerr<<"Falha na escolha da pista"<<std::endl;
+						break;
 					}
-
-					estatistica(&Ranking);
-					salvar_arquivo_stats(&Ranking, Silvestre);
-					Ranking.clear();
-
-					Atual = NULL;
-					menu(&simu, &simulacao);
-
-					if(!simulacao)
-						encerrar_corrida(Silvestre);
-
+					ver_participantes(&conjunto);
+					pei();
+					corre_negada(&conjunto, Atual->getTamanho(), &ranking);
+					mostrar_ranking(&ranking);
+					jogar_novamente(&simulacao);
+					break;
+			default:
+					simulacao = false;
 					break;
 		}
 	}
 
-	Pistas_disponiveis->clear();
-	Competidores->clear();
+	liberar_espaco(&conjunto);
+	liberar_espaco(&tracks);
+	liberar_espaco(&ranking);
+	Atual = NULL;
+	novo_sapo = NULL;
+	delete novo_sapo;
 
-	delete Pistas_disponiveis;
-	delete Competidores;
-	delete Silvestre;
-	delete Atual;
+	std::cout<<"Aperte Enter para finalizar"<<std::endl;
+	std::cin.get();
 
-	return 0;
+  return 0;
 }
+
 
 
