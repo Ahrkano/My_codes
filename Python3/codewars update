@@ -1,0 +1,116 @@
+import math 
+def primeFactors(n): 
+    
+    bank = []
+
+    while n % 2 == 0: 
+        bank.append(2)
+        n = n / 2
+
+    for i in range(3,int(math.sqrt(n))+1,2): 
+
+        while n % i== 0: 
+            bank.append(i) 
+            n = n / i 
+
+    if n > 2: 
+        bank.append(n)
+        
+    return bank
+
+def sum_for_list(lst):
+    
+    bank = []
+    result = []
+    
+    for i in lst:
+        bank+=primeFactors(abs(i))
+        
+        
+        
+    for x in set(bank):
+        value = 0
+        for y in lst:
+            if y%x == 0:
+                value += y
+        result.append([int(x), value])
+        
+        
+    return sorted(result)  
+
+##=====================================================================
+##melhor resposta
+
+def sum_for_list(lst):
+    factors = {i for k in lst for i in xrange(2, abs(k)+1) if not k % i}
+    prime_factors = {i for i in factors if not [j for j in factors-{i} if not i % j]}
+    return [[p, sum(e for e in lst if not e % p)] for p in sorted(prime_factors)] 
+##=====================================================================
+
+
+
+def to_right(array, start_x, start_y, size):
+    res = []
+    for i in range(0, size):
+        res.append(array[start_x][start_y])
+        start_y += 1
+    return res
+
+def to_left(array, start_x, start_y, size):
+    res = []
+    for i in range(0, size):
+        res.append(array[start_x][start_y])
+        start_y -= 1
+    return res
+
+def to_down(array, start_x, start_y, size):
+    res = []
+    for i in range(0, size):
+        res.append(array[start_x][start_y])
+        start_x += 1
+    return res
+
+def to_up(array, start_x, start_y, size):
+    res = []
+    for i in range(0, size):
+        res.append(array[start_x][start_y])
+        start_x -= 1
+    return res
+
+def snail(array):
+
+    count = 1
+    flag = len(array)
+    bank = []
+    
+    l_t = [0, 0]
+    r_t = [0, flag-1]
+    r_b = [flag-1, flag-1]
+    l_b = [flag-1, 0]
+    
+    while count < (len(array)*len(array)) + 1:
+        
+        if count%1 == 0:
+            bank+=to_right(array, l_t[0], l_t[1], flag)
+            l_t[0]+=1 
+            l_t[1]+=1
+            flag -= 1
+        if count%2 == 0:
+            bank+=to_down(array, r_t[0], r_t[1], flag)
+            r_t[0]+=1 
+            r_t[1]+=1
+            flag -= 1
+        if count%3 == 0:
+            bank+=to_left(array, l_b[0], l_b[1], flag)
+            l_b[0]+=1 
+            l_b[1]+=1
+            flag -= 1
+        if count%4 == 0:
+            bank+=to_up(array, r_b[0], r_b[1], flag)
+            r_b[0]+=1 
+            r_b[1]+=1
+            flag -= 1  
+            
+        count+=1
+ 
+    return bank
