@@ -1,22 +1,22 @@
-#teste de execução
-#C:\Users\Alexandre\Anaconda3\python.exe C:\Users\Alexandre\pol.py -hash -hmac minha_chave -i -x -t -dir C:\Users\.......
-
 import os
 import shutil
+import hmac
+import base64
 import hashlib
 import ctypes
 import argparse
 
 # Realiza HMAC no arquivo e retorna o resultado
-def filehash_hmac(filepath, secretKey):
-    sha256 = hashlib.sha256()
+def filehash_hmac(filepath, chave):
+    secret = bytes(chave, 'utf-8')
+    signature = hmac.new(secret, digestmod=hashlib.sha256)
     with open(filepath, 'rb') as fp:
         while True:
             data = fp.read()
             if not data:
                 break
-            sha256.update(data + secretKey)
-    return sha256.digest()
+            signature.update(data)
+    return(base64.b64encode(signature.digest()))
 
 # Realiza HASH no arquivo e retorna o resultado
 def filehash(filepath):
@@ -144,7 +144,7 @@ def main():
     
     parser.add_argument('-x', action='store_true', help="Remove os arquivos de log e libera a pasta")
     
-    parser.add_argument('-dir', type=str, nargs='?', default='C:\\Users', metavar='DIR', help="Diretorio a ser monitorado")
+    parser.add_argument('-dir', type=str, nargs='?', default='C:\\Users\\teste', metavar='DIR', help="Diretorio a ser monitorado")
     
     parser.add_argument('-o', type=str, nargs='?', const='log.txt', default=None, metavar='OUT', help="Arquivo de saida")
     
@@ -169,10 +169,13 @@ def main():
     
     # Refaz o hash e salva em arquivo
     if arguments.t :
-        hashdir(path, last_log)
+        if arguments.hash :
+            hashdir(path, last_log)
+        if arguments.hmac :
+            hashdir_hmac(path, last_log, arguments.hmac)
         # compara os logs e salve em arquivo ou imprime na tela
         if arguments.o:
-            compare(first_log, last_log, arguments.o, True)
+            compare(first_log, last_log, path+'\\.guard\\'+arguments.o, True)
         else:
             compare(first_log, last_log, '', False)
     
